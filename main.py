@@ -105,20 +105,14 @@ class NN:
         output_deltas = [0.0] * self.output_node_num
         for k in range(self.output_node_num):
             error = targets[k] - self.onv[k]
-            if self.AF == 0:
-                output_deltas[k] = dsigmoid(self.onv[k]) * error
-            else:
-                output_deltas[k] = dReLu(self.onv[k]) * error
+            output_deltas[k] = dsigmoid(self.onv[k]) * error
 
         hidden_deltas = [0.0] * self.hidden_node_num
         for j in range(self.hidden_node_num):
             error = 0.0
             for k in range(self.output_node_num):
                 error = error + output_deltas[k] * self.wo[j][k]
-            if self.AF == 0:
-                hidden_deltas[j] = dsigmoid(self.hnv[j]) * error
-            else:
-                hidden_deltas[j] = dReLu(self.hnv[j]) * error
+            hidden_deltas[j] = dsigmoid(self.hnv[j]) * error
 
         self.update_out_weight(output_deltas)
         self.update_input_weight(hidden_deltas)
