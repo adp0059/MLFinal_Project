@@ -38,9 +38,6 @@ def baselineNB(x_train, y_train, x_test, y_test, dist):
 
     # Report Test Accuracy, Classification Report, and Confusion Matrix
 
-    # test_acc = (model.score(x_test, y_test)) * 100
-    # print("Test Accuracy:", format(test_acc, ".3f"))
-
     print("\nNB Classification Report")
     report = metrics.classification_report(y_test, y_pred)
     print(report)
