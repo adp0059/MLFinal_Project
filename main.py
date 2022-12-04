@@ -147,7 +147,7 @@ def load_data(path):
 # https://github.com/Meenapintu/Spam-Detection
 def run(x_train, x_test, y_train, y_test, ep):
     print("Running Multilayered Perceptron")
-    n = NN(58, 2, 1, .5, 0)
+    n = NN(58, 2, 1, .5)
     n.fit(x_train, y_train, ep)
 
     y_pred = n.predict(x_test)
@@ -186,12 +186,14 @@ def run(x_train, x_test, y_train, y_test, ep):
 # Data processing
 path = "spambase/spambase.data"
 data, labels = load_data(path)
-x_train, x_test, y_train, y_test = train_test_split(data, labels,shuffle=True, test_size=0.2, random_state=1)
+x_train, x_test, y_train, y_test = train_test_split(data, labels, shuffle=True, test_size=0.2, random_state=1)
 
 for _ in range(1):
     run(x_train, x_test, y_train, y_test, 10)
 
 # Baseline Functions
-baselineNB(x_train, y_train, x_test, y_test, 2)
+baselineNB(x_train, y_train, x_test, y_test, 0)
 baselineDT(x_train, y_train, x_test, y_test)
+
+
 

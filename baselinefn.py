@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from sklearn.naive_bayes import BernoulliNB, GaussianNB, MultinomialNB
+from sklearn.naive_bayes import BernoulliNB, MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
@@ -13,8 +13,7 @@ baselineNB: function for Naive Bayes Baseline
 :param y_test: testing labels
 :param dist: set distribution
              0: Bernoulli
-             1: Gaussian
-             2: Multinomial
+             1: Multinomial
 """
 
 
@@ -24,9 +23,6 @@ def baselineNB(x_train, y_train, x_test, y_test, dist):
     if dist == 0:
         model = BernoulliNB()
         print("Running Bernoulli Naive Bayes")
-    elif dist == 1:
-        model = GaussianNB()
-        print("Running Gaussian Naive Bayes")
     else:
         model = MultinomialNB()
         print("Running Multinomial Naive Bayes")
@@ -45,8 +41,6 @@ def baselineNB(x_train, y_train, x_test, y_test, dist):
     plot_Conf(y_pred, y_test)
     if dist == 0:
         plt.savefig("Matrix/Confusion_matrix_NB_B")
-    elif dist == 1:
-        plt.savefig("Matrix/Confusion_matrix_NB_G")
     else:
         plt.savefig("Matrix/Confusion_matrix_NB_M")
     print("NB Confusion Matrix saved")
@@ -54,8 +48,6 @@ def baselineNB(x_train, y_train, x_test, y_test, dist):
     plot_ROC(model, x_test, y_test)
     if dist == 0:
         plt.savefig("ROC/ROC_NB_B")
-    elif dist == 1:
-        plt.savefig("ROC/ROC_NB_G")
     else:
         plt.savefig("ROC/ROC_NB_M")
     print("NB ROC Curve saved\n")
@@ -88,6 +80,10 @@ def baselineDT(x_train, y_train, x_test, y_test):
     print("\nDT Classification Report")
     report = metrics.classification_report(y_test, y_pred)
     print(report)
+
+    plot_Conf(y_pred, y_test)
+    plt.savefig("Matrix/Confusion_matrix_NB_B")
+    print("NB Confusion Matrix saved")
 
     plot_ROC(clf, x_test, y_test)
     plt.savefig("ROC/ROC_DT")
