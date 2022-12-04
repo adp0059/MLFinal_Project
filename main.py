@@ -184,7 +184,6 @@ for _ in range(1):
     run(x_train, x_test, y_train, y_test)
 
 # Baseline Functions
-baselineNB(x_train, y_train, x_test, y_test, 0)
 baselineNB(x_train, y_train, x_test, y_test, 2)
 baselineDT(x_train, y_train, x_test, y_test)
 
