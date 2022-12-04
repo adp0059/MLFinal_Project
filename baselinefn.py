@@ -42,19 +42,33 @@ def baselineNB(x_train, y_train, x_test, y_test, dist):
     report = metrics.classification_report(y_test, y_pred)
     print(report)
 
-    cm = confusion_matrix(y_pred, y_test)
-    ConfusionMatrixDisplay(cm).plot()
-    plt.title("Confusion Matrix")
+    plot_Conf(y_pred, y_test)
     if dist == 0:
         plt.savefig("Matrix/Confusion_matrix_NB_B")
     elif dist == 1:
         plt.savefig("Matrix/Confusion_matrix_NB_G")
     else:
         plt.savefig("Matrix/Confusion_matrix_NB_M")
-    print("NB Confusion Matrix saved\n")
+    print("NB Confusion Matrix saved")
+
+    plot_ROC(model, x_test, y_test)
+    if dist == 0:
+        plt.savefig("ROC/ROC_NB_B")
+    elif dist == 1:
+        plt.savefig("ROC/ROC_NB_G")
+    else:
+        plt.savefig("ROC/ROC_NB_M")
+    print("NB ROC Curve saved\n")
 
     return ()
 
+"""
+baselineDT: function for Decision Tree Baseline
+:param x_train: training data
+:param y_train: training labels
+:param x_test: testing data
+:param y_test: testing labels
+"""
 def baselineDT(x_train, y_train, x_test, y_test):
     print("Running Decision Tree")
 
@@ -75,11 +89,30 @@ def baselineDT(x_train, y_train, x_test, y_test):
     report = metrics.classification_report(y_test, y_pred)
     print(report)
 
+    plot_ROC(clf, x_test, y_test)
+    plt.savefig("ROC/ROC_DT")
+    print("DT ROC Curve saved\n")
+
+    return()
+
+def plot_ROC(model, x_test, y_test):
+    plt.clf()
+    # define metrics
+    y_pred_proba = model.predict_proba(x_test)[::, 1]
+    fpr, tpr, _ = metrics.roc_curve(y_test, y_pred_proba)
+    auc = metrics.roc_auc_score(y_test, y_pred_proba)
+
+    # create ROC curve
+    plt.plot(fpr, tpr, label="AUC="+str(auc))
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.title("ROC Curve")
+    plt.legend(loc=4)
+    return ()
+
+def plot_Conf(y_pred, y_test):
+    plt.clf()
     cm = confusion_matrix(y_pred, y_test)
     ConfusionMatrixDisplay(cm).plot()
     plt.title("Confusion Matrix")
-    plt.savefig("Matrix/Confusion_matrix_DT")
-
-    print("DT Confusion Matrix saved")
-
-    return()
+    return ()

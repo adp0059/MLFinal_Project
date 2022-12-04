@@ -2,6 +2,7 @@ import csv
 import random
 import numpy as np
 from baselinefn import *
+from sklearn.metrics import precision_recall_fscore_support
 from sklearn.model_selection import ShuffleSplit, train_test_split
 
 # https://github.com/Meenapintu/Spam-Detection
@@ -35,9 +36,10 @@ def dReLu(y):
 
 
 class NN:
-    def __init__(self, input_node_num, hidden_node_num, output_node_num):
-        self.LR = 0.5;
+    def __init__(self, input_node_num, hidden_node_num, output_node_num, lr):
+        self.LR = lr;
         self.MF = 0.1;
+        self.pred_prob = []
 
         self.input_node_num = input_node_num
         self.hidden_node_num = hidden_node_num
@@ -59,7 +61,6 @@ class NN:
         for j in range(self.hidden_node_num):
             for k in range(self.output_node_num):
                 self.wo[j][k] = rand(-1.0, 1.0)
-                # self.lrco[j][k] = rand(-1.0, 1.0)
 
     def update(self, inputs):
         if len(inputs) != self.input_node_num - 1:
@@ -67,6 +68,7 @@ class NN:
 
         for i in range(self.input_node_num - 1):
             self.inv[i] = sigmoid(inputs[i])
+
 
         for j in range(self.hidden_node_num):
             sum = 0.0
@@ -103,60 +105,56 @@ class NN:
         output_deltas = [0.0] * self.output_node_num
         for k in range(self.output_node_num):
             error = targets[k] - self.onv[k]
-            output_deltas[k] = dsigmoid(self.onv[k]) * error
+            if self.AF == 0:
+                output_deltas[k] = dsigmoid(self.onv[k]) * error
+            else:
+                output_deltas[k] = dReLu(self.onv[k]) * error
 
         hidden_deltas = [0.0] * self.hidden_node_num
         for j in range(self.hidden_node_num):
             error = 0.0
             for k in range(self.output_node_num):
                 error = error + output_deltas[k] * self.wo[j][k]
-            hidden_deltas[j] = dsigmoid(self.hnv[j]) * error
+            if self.AF == 0:
+                hidden_deltas[j] = dsigmoid(self.hnv[j]) * error
+            else:
+                hidden_deltas[j] = dReLu(self.hnv[j]) * error
 
         self.update_out_weight(output_deltas)
         self.update_input_weight(hidden_deltas)
 
     def predict(self, x_test):
         predictions = []
-        # out_file=open("output.csv",'wb')
-        # writer=csv.writer(out_file, dialect='excel')
-        # writer.writerow(['Id','Label',])
         for p in x_test:
+            self.pred_prob.append(self.update(p)[0])
             if self.update(p)[0] > .5:
-                # writer.writerow([count,1])
-                # print(1)
                 predictions.append(1)
             else:
-                # writer.writerow([count,0])
-                # print(0)
                 predictions.append(0)
         return predictions
 
-    def fit(self, x_train, y_train, epochs=30):
+    def fit(self, x_train, y_train, epochs):
         for _ in range(epochs):
             for j in range(len(x_train)):
-                # inputs = p[0]
-                # targets = p[1]
                 self.update(x_train[j])
                 self.backPropagate([y_train[j]])
-
 
 def load_data(path):
     with open(path, newline="") as file:
         arr = list(csv.reader(file))
     data = np.array(arr)
 
-    X = data[:, :-1]
-    Y = data[:, -1]
+    X = data[:, :-1].astype(float)
+    Y = data[:, -1].astype(int)
 
     return X.astype(np.float16), Y.astype(int)
 
 
 # https://github.com/Meenapintu/Spam-Detection
-def run(x_train, x_test, y_train, y_test):
+def run(x_train, x_test, y_train, y_test, ep):
     print("Running Multilayered Perceptron")
-    n = NN(58, 2, 1)
-
-    n.fit(x_train, y_train)
+    n = NN(58, 2, 1, .5, 0)
+    n.fit(x_train, y_train, ep)
 
     y_pred = n.predict(x_test)
 
@@ -173,15 +171,31 @@ def run(x_train, x_test, y_train, y_test):
     plt.savefig("Matrix/Confusion_matrix_MLP")
 
     print("MLP Confusion Matrix saved\n")
+    plt.clf()
+
+    # define metrics
+    y_pred_proba = n.pred_prob
+    fpr, tpr, _ = metrics.roc_curve(y_test, y_pred_proba)
+    auc = metrics.roc_auc_score(y_test, y_pred_proba)
+
+    # create ROC curve
+    plt.plot(fpr, tpr, label="AUC=" + str(auc))
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.title("ROC Curve")
+    plt.legend(loc=4)
+
+    plt.savefig("ROC/ROC_MLP")
+    print("MLP ROC Curve saved\n")
 
 
 # Data processing
 path = "spambase/spambase.data"
 data, labels = load_data(path)
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=1)
+x_train, x_test, y_train, y_test = train_test_split(data, labels,shuffle=True, test_size=0.2, random_state=1)
 
 for _ in range(1):
-    run(x_train, x_test, y_train, y_test)
+    run(x_train, x_test, y_train, y_test, 10)
 
 # Baseline Functions
 baselineNB(x_train, y_train, x_test, y_test, 2)
