@@ -145,9 +145,9 @@ def load_data(path):
 
 
 # https://github.com/Meenapintu/Spam-Detection
-def run(x_train, x_test, y_train, y_test, ep):
+def run(x_train, x_test, y_train, y_test, ep, lr, nodes):
     print("Running Multilayered Perceptron")
-    n = NN(58, 2, 1, .5)
+    n = NN(58, nodes, 1, lr)
     n.fit(x_train, y_train, ep)
 
     y_pred = n.predict(x_test)
@@ -182,17 +182,29 @@ def run(x_train, x_test, y_train, y_test, ep):
     plt.savefig("ROC/ROC_MLP")
     print("MLP ROC Curve saved\n")
 
-
 # Data processing
 path = "spambase/spambase.data"
 data, labels = load_data(path)
 x_train, x_test, y_train, y_test = train_test_split(data, labels, shuffle=True, test_size=0.2, random_state=1)
+print("Data processed\n")
+
+ep = input("Enter number of epochs: ")
+print(ep)
+
+lr = input("Enter your learning rate: ")
+print(lr)
+
+nodes = input("Enter number of nodes in hidden layer: ")
+print(nodes)
+
+dist = input("Enter your distribution for Naive Bayes (0: Bernoulli, 1: Multinomial):")
+print(dist)
 
 for _ in range(1):
-    run(x_train, x_test, y_train, y_test, 10)
+    run(x_train, x_test, y_train, y_test, int(ep), float(lr), int(nodes))
 
 # Baseline Functions
-baselineNB(x_train, y_train, x_test, y_test, 0)
+baselineNB(x_train, y_train, x_test, y_test, int(dist))
 baselineDT(x_train, y_train, x_test, y_test)
 
 
