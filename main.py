@@ -2,8 +2,7 @@ import csv
 import random
 import numpy as np
 from baselinefn import *
-from sklearn.metrics import precision_recall_fscore_support
-from sklearn.model_selection import ShuffleSplit, train_test_split
+from sklearn.model_selection import train_test_split
 
 # https://github.com/Meenapintu/Spam-Detection
 
@@ -197,15 +196,20 @@ print(lr)
 nodes = input("Enter number of nodes in hidden layer: ")
 print(nodes)
 
-dist = input("Enter your distribution for Naive Bayes (0: Bernoulli, 1: Multinomial):")
-print(dist)
+base = input("Run baseline functions? (0: no, 1: yes): ")
+print(base)
+
+if(int(base) == 1):
+    dist = input("Enter your distribution for Naive Bayes (0: Bernoulli, 1: Multinomial): ")
+    print(dist)
 
 for _ in range(1):
     run(x_train, x_test, y_train, y_test, int(ep), float(lr), int(nodes))
 
-# Baseline Functions
-baselineNB(x_train, y_train, x_test, y_test, int(dist))
-baselineDT(x_train, y_train, x_test, y_test)
+if(int(base) == 1):
+    # Baseline Functions
+    baselineNB(x_train, y_train, x_test, y_test, int(dist))
+    baselineDT(x_train, y_train, x_test, y_test)
 
 
 
